@@ -1,0 +1,79 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-8 animate-fade-in">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-4 shadow-lg">
+        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">Order Receipt</h1>
+      <p class="text-gray-600">Generate and download your order receipt</p>
+    </div>
+
+    <div class="max-w-md mx-auto">
+      <!-- Receipt Generation Card -->
+      <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+        <div class="text-center">
+          
+          <!-- Generating State -->
+          <div *ngIf="isGenerating" class="animate-pulse">
+            <div class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-6 shadow-lg">
+              <svg class="w-12 h-12 text-white animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-4">Generating Receipt...</h3>
+            <div class="w-full bg-gray-200 rounded-full h-4 mb-4">
+              <div 
+                class="bg-gradient-to-r from-blue-500 to-purple-600 h-4 rounded-full transition-all duration-300"
+                [style.width.%]="progress">
+              </div>
+            </div>
+            <p class="text-gray-600 text-lg">{{progress}}% Complete</p>
+          </div>
+
+          <!-- Downloading State -->
+          <div *ngIf="isDownloading" class="animate-pulse">
+            <div class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-r from-green-500 to-teal-600 rounded-full mb-6 shadow-lg">
+              <svg class="w-12 h-12 text-white animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-4">Downloading Receipt...</h3>
+            <p class="text-gray-600 text-lg">Your receipt is being downloaded automatically</p>
+          </div>
+
+          <!-- Success State -->
+          <div *ngIf="showSuccess" class="animate-bounce-in">
+            <div class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full mb-6 shadow-lg">
+              <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-2xl font-semibold text-green-800 mb-4">Download Successful!</h3>
+            <p class="text-green-600 mb-8">Your receipt has been downloaded successfully</p>
+            
+            <div class="bg-green-50 rounded-xl p-4 mb-6">
+              <div class="flex items-center justify-center gap-2 text-green-700">
+                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                </svg>
+                <span class="font-medium">Thank you for your order!</span>
+              </div>
+            </div>
+            
+            <button
+              (click)="restartDownload()"
+              class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-3 rounded-full font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 mx-auto">
+              Download Again
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
