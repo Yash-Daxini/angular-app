@@ -1,14 +1,16 @@
+import { CommonModule } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 
 @Component({
+  imports:[CommonModule],
   selector: 'order-receipt-download',
   templateUrl: './order-receipt-download.component.html',
   styleUrls: ['./order-receipt-download.component.css']
 })
 export class OrderReceiptDownloadComponent implements OnInit {
   isGenerating = true;
-  isDownloading = false;
-  showSuccess = false;
+  isDownloading = true;
+  showSuccess = true;
   progress = 0;
 
   orderData = {
@@ -26,33 +28,33 @@ export class OrderReceiptDownloadComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    if (this.progressInterval) {
-      clearInterval(this.progressInterval);
-    }
+    // if (this.progressInterval) {
+    //   clearInterval(this.progressInterval);
+    // }
   }
 
   private startDownload() {
     // Phase 1: Generate receipt
-    this.progressInterval = setInterval(() => {
-      this.progress += 10;
-      if (this.progress >= 100) {
-        clearInterval(this.progressInterval);
-        // Phase 2: Start download after generation
-        setTimeout(() => {
-          this.isGenerating = false;
-          this.isDownloading = true;
+    // this.progressInterval = setInterval(() => {
+    //   this.progress += 10;
+    //   if (this.progress >= 100) {
+    //     clearInterval(this.progressInterval);
+    //     // Phase 2: Start download after generation
+    //     setTimeout(() => {
+    //       this.isGenerating = false;
+    //       this.isDownloading = true;
           
-          // Phase 3: Complete download
-          setTimeout(() => {
-            this.isDownloading = false;
-            this.showSuccess = true;
+    //       // Phase 3: Complete download
+    //       setTimeout(() => {
+    //         this.isDownloading = false;
+    //         this.showSuccess = true;
             
             // Simulate actual download
             this.downloadFile();
-          }, 1500);
-        }, 500);
-      }
-    }, 200);
+    //       }, 1500);
+    //     }, 500);
+    //   }
+    // }, 200);
   }
 
   private downloadFile() {

@@ -1,6 +1,204 @@
-   @tailwind base;
-   @tailwind components;
-   @tailwind utilities;
+  .page {
+  min-height: 100vh;
+  background: linear-gradient(to bottom right, #eff6ff, #ffffff, #f5f3ff);
+  padding: 1.5rem;
+}
+
+.wrapper {
+  max-width: 64rem;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.header-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  background: linear-gradient(to right, #3b82f6, #8b5cf6);
+  border-radius: 9999px;
+  margin-bottom: 1rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.header-svg {
+  width: 2rem;
+  height: 2rem;
+  color: white;
+}
+
+.header-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.header-subtitle {
+  color: #4b5563;
+}
+
+.card-container {
+  max-width: 28rem;
+  margin: 0 auto;
+}
+
+.card {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f3f4f6;
+}
+
+.state-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 6rem;
+  height: 6rem;
+  background: linear-gradient(to right, #3b82f6, #8b5cf6);
+  border-radius: 9999px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.state-icon.green {
+  background: linear-gradient(to right, #10b981, #14b8a6);
+}
+
+.state-icon.emerald {
+  background: linear-gradient(to right, #10b981, #059669);
+}
+
+.state-svg {
+  width: 3rem;
+  height: 3rem;
+  color: white;
+}
+
+.state-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 1rem;
+  background: #e5e7eb;
+  border-radius: 9999px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, #3b82f6, #8b5cf6);
+  border-radius: 9999px;
+  transition: all 0.3s ease-in-out;
+}
+
+.progress-text {
+  color: #4b5563;
+  font-size: 1.125rem;
+}
+
+.success-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #065f46;
+  margin-bottom: 1rem;
+}
+
+.success-text {
+  color: #047857;
+  margin-bottom: 2rem;
+}
+
+.thank-you-box {
+  background: #ecfdf5;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.thank-you-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #047857;
+}
+
+.star-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: currentColor;
+}
+
+.thank-you-text {
+  font-weight: 500;
+}
+
+.download-btn {
+  background: linear-gradient(to right, #3b82f6, #8b5cf6);
+  padding: 0.75rem 2rem;
+  color: white;
+  font-weight: 500;
+  border-radius: 9999px;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0 auto;
+}
+
+.download-btn:hover {
+  background: linear-gradient(to right, #2563eb, #6b21a8);
+  transform: scale(1.05);
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+}
+
+.arrow-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Animations */
+@keyframes fade-in {
+  from { opacity: 0 }
+  to { opacity: 1 }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-0.5rem); }
+}
+
+@keyframes bounce-in {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.fade-in { animation: fade-in 0.5s ease-out forwards; }
+.pulse { animation: pulse 2s infinite; }
+.bounce { animation: bounce 1s infinite; }
+.bounce-in { animation: bounce-in 0.6s ease-out forwards; }
+
 
 @keyframes fade-in {
   from { 
