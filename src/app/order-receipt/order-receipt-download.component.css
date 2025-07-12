@@ -1,6 +1,6 @@
   .page {
-  min-height: 100vh;
-  background: linear-gradient(to bottom right, #eff6ff, #ffffff, #f5f3ff);
+  min-height: 50vh;
+  min-width: 50vw;
   padding: 1.5rem;
 }
 
