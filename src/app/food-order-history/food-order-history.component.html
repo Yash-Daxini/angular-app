@@ -1,0 +1,234 @@
+<div class="container">
+  <div class="content-wrapper">
+    <!-- Header -->
+    <div class="header animate-fade-in">
+      <div class="header-icon">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+        </svg>
+      </div>
+      <h1 class="title">Food Order History</h1>
+      <p class="subtitle">Track your delicious food orders and reorder your favorites</p>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="filter-section">
+      <div class="filter-content">
+        <div class="filter-controls">
+          <div class="filter-label">
+            <svg class="filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"></polygon>
+            </svg>
+            <span>Filter Orders:</span>
+          </div>
+          <div class="filter-buttons">
+            <button 
+              *ngFor="let status of ['all', 'delivered', 'ontheway', 'preparing']"
+              (click)="setFilter(status)"
+              class="filter-btn"
+              [class.active]="filter === status">
+              <span *ngIf="status === 'all'">🍽️ All Orders</span>
+              <span *ngIf="status === 'delivered'">✅ Delivered</span>
+              <span *ngIf="status === 'ontheway'">🚗 On the Way</span>
+              <span *ngIf="status === 'preparing'">👨‍🍳 Preparing</span>
+            </button>
+          </div>
+        </div>
+        
+        <div class="search-container">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <input
+            type="text"
+            placeholder="Search restaurants, dishes, or order ID..."
+            [(ngModel)]="searchTerm"
+            class="search-input"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders List -->
+    <div class="orders-list">
+      <div
+        *ngFor="let order of filteredOrders; let i = index"
+        class="order-card"
+        [class.animated]="isAnimated(i)"
+      >
+        <!-- Order Header -->
+        <div class="order-header">
+          <div class="order-info">
+            <div class="order-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+            </div>
+            <div class="order-details">
+              <h3 class="order-id">{{ order.id }}</h3>
+              <div class="restaurant-name">
+                <svg class="restaurant-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+                <span>{{ order.restaurant }}</span>
+              </div>
+              <div class="order-meta">
+                <div class="meta-item">
+                  <svg class="meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  <span>{{ formatDate(order.date) }}</span>
+                </div>
+                <div class="meta-item">
+                  <svg class="meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12,6 12,12 16,14"></polyline>
+                  </svg>
+                  <span>{{ order.deliveryTime }}</span>
+                </div>
+                <div class="status-badge" [ngClass]="getStatusClass(order.status)">
+                  <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getStatusIcon(order.status)"></path>
+                  </svg>
+                  <span>{{ order.status }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="order-actions">
+            <div class="order-total">
+              <div class="total-amount">${{ order.total }}</div>
+              <div class="payment-method">
+                <svg class="payment-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                  <line x1="1" y1="10" x2="23" y2="10"></line>
+                </svg>
+                <span>{{ order.paymentMode }}</span>
+              </div>
+            </div>
+            
+            <div class="action-buttons">
+              <button class="action-btn reorder-btn" title="Reorder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+              </button>
+              <button class="action-btn receipt-btn" title="View Receipt">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </button>
+              <button class="action-btn expand-btn" (click)="toggleExpanded(order.id)" title="Toggle Details">
+                <svg *ngIf="expandedOrder !== order.id" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <polyline points="6,9 12,15 18,9"></polyline>
+                </svg>
+                <svg *ngIf="expandedOrder === order.id" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <polyline points="18,15 12,9 6,15"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Food Summary -->
+        <div class="food-summary">
+          <div class="summary-info">
+            <svg class="utensils-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 1.5M7 13l-1.5 1.5m0 0L9 18h6m-6 0a2 2 0 100 4 2 2 0 000-4zm8 0a2 2 0 100 4 2 2 0 000-4z"></path>
+            </svg>
+            <span>{{ getTotalItems(order) }} items from {{ order.restaurant }}</span>
+          </div>
+          <div class="food-thumbnails">
+            <div
+              *ngFor="let item of order.items.slice(0, 4); let idx = index"
+              class="food-thumb animate-float"
+              [title]="item.name"
+              [style.animation-delay]="idx * 0.1 + 's'"
+            >
+              {{ item.image }}
+            </div>
+            <div *ngIf="order.items.length > 4" class="food-thumb more-items">
+              +{{ order.items.length - 4 }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Expanded Food Details -->
+        <div *ngIf="expandedOrder === order.id" class="expanded-details animate-expand">
+          <div class="details-content">
+            <h4 class="details-title">
+              <svg class="chef-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+              Order Details from {{ order.restaurant }}
+            </h4>
+            <div class="food-list">
+              <div
+                *ngFor="let item of order.items; let idx = index"
+                class="food-item animate-slide-in"
+                [style.animation-delay]="idx * 0.1 + 's'"
+              >
+                <div class="food-info">
+                  <div class="food-image">
+                    {{ item.image }}
+                  </div>
+                  <div class="food-details">
+                    <h5 class="food-name">{{ item.name }}</h5>
+                    <p class="food-category">{{ item.category }}</p>
+                    <p class="food-quantity">Quantity: {{ item.quantity }}</p>
+                  </div>
+                </div>
+                <div class="food-pricing">
+                  <div class="food-price">${{ item.price }}</div>
+                  <div *ngIf="item.quantity > 1" class="food-total">
+                    ${{ calculateItemTotal(item).toFixed(2) }} total
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Order Summary -->
+              <div class="order-summary">
+                <div class="delivery-info">
+                  <div class="delivery-item">
+                    <span>Subtotal</span>
+                    <span>${{ (order.total - 3.99).toFixed(2) }}</span>
+                  </div>
+                  <div class="delivery-item">
+                    <span>Delivery Fee</span>
+                    <span>$3.99</span>
+                  </div>
+                </div>
+                <div class="grand-total">
+                  <span>Total Paid</span>
+                  <span class="total-price">${{ order.total }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredOrders.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+        </svg>
+      </div>
+      <h3 class="empty-title">No food orders found</h3>
+      <p class="empty-text">Looks like you haven't ordered any delicious food yet!</p>
+      <button class="order-now-btn">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        </svg>
+        Order Now
+      </button>
+    </div>
+  </div>
+</div>
