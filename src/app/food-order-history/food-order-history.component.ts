@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'
+import { FormsModule } from '@angular/forms';
 
 interface FoodItem {
   name: string;
@@ -8,6 +8,14 @@ interface FoodItem {
   quantity: number;
   image: string;
   category: string;
+}
+
+interface UserOrder {
+  userId: string;
+  userName: string;
+  userAvatar: string;
+  items: FoodItem[];
+  subtotal: number;
 }
 
 interface FoodOrder {
@@ -18,7 +26,14 @@ interface FoodOrder {
   total: number;
   deliveryTime: string;
   restaurant: string;
-  items: FoodItem[];
+  orderType: 'individual' | 'group';
+  items: FoodItem[]; // For individual orders
+  userOrders?: UserOrder[]; // For group orders
+  groupInfo?: {
+    totalUsers: number;
+    organizer: string;
+    splitType: 'equal' | 'individual';
+  };
 }
 
 @Component({
@@ -29,11 +44,13 @@ interface FoodOrder {
 })
 export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
   expandedOrder: string | null = null;
+  expandedUser: string | null = null;
   animatedOrders = new Set<number>();
   filter = 'all';
   searchTerm = '';
 
   orders: FoodOrder[] = [
+    // Individual Order
     {
       id: 'FD-2024-001234',
       date: '2024-07-20',
@@ -42,6 +59,7 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
       total: 42.95,
       deliveryTime: '25 mins',
       restaurant: 'Burger Palace',
+      orderType: 'individual',
       items: [
         { name: 'Classic Cheeseburger', price: 12.99, quantity: 2, image: '🍔', category: 'Burgers' },
         { name: 'Chocolate Milkshake', price: 5.99, quantity: 1, image: '🥤', category: 'Beverages' },
@@ -49,20 +67,68 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
         { name: 'Onion Rings', price: 3.99, quantity: 1, image: '🧅', category: 'Sides' }
       ]
     },
+
+    // Group Order
     {
       id: 'FD-2024-001189',
       date: '2024-07-18',
       status: 'Delivered',
       paymentMode: 'Digital Wallet',
-      total: 28.50,
-      deliveryTime: '30 mins',
+      total: 85.50,
+      deliveryTime: '35 mins',
       restaurant: 'Pizza Corner',
-      items: [
-        { name: 'Margherita Pizza (Medium)', price: 16.99, quantity: 1, image: '🍕', category: 'Pizza' },
-        { name: 'Garlic Bread', price: 6.99, quantity: 1, image: '🍞', category: 'Sides' },
-        { name: 'Coca Cola', price: 2.99, quantity: 2, image: '🥤', category: 'Beverages' }
+      orderType: 'group',
+      items: [], // Empty for group orders
+      groupInfo: {
+        totalUsers: 4,
+        organizer: 'Alex Johnson',
+        splitType: 'individual'
+      },
+      userOrders: [
+        {
+          userId: 'user1',
+          userName: 'Alex Johnson',
+          userAvatar: '👨‍💼',
+          subtotal: 23.97,
+          items: [
+            { name: 'Margherita Pizza (Medium)', price: 16.99, quantity: 1, image: '🍕', category: 'Pizza' },
+            { name: 'Garlic Bread', price: 6.99, quantity: 1, image: '🍞', category: 'Sides' }
+          ]
+        },
+        {
+          userId: 'user2',
+          userName: 'Sarah Wilson',
+          userAvatar: '👩‍🎨',
+          subtotal: 19.98,
+          items: [
+            { name: 'Pepperoni Pizza (Small)', price: 13.99, quantity: 1, image: '🍕', category: 'Pizza' },
+            { name: 'Coca Cola', price: 2.99, quantity: 2, image: '🥤', category: 'Beverages' }
+          ]
+        },
+        {
+          userId: 'user3',
+          userName: 'Mike Chen',
+          userAvatar: '👨‍💻',
+          subtotal: 22.97,
+          items: [
+            { name: 'Vegetarian Pizza (Medium)', price: 15.99, quantity: 1, image: '🍕', category: 'Pizza' },
+            { name: 'Caesar Salad', price: 6.99, quantity: 1, image: '🥗', category: 'Salads' }
+          ]
+        },
+        {
+          userId: 'user4',
+          userName: 'Emma Davis',
+          userAvatar: '👩‍🔬',
+          subtotal: 14.59,
+          items: [
+            { name: 'Chicken Wings (6pc)', price: 9.99, quantity: 1, image: '🍗', category: 'Appetizers' },
+            { name: 'Lemonade', price: 3.99, quantity: 1, image: '🍋', category: 'Beverages' }
+          ]
+        }
       ]
     },
+
+    // Individual Order
     {
       id: 'FD-2024-001156',
       date: '2024-07-15',
@@ -71,28 +137,68 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
       total: 35.75,
       deliveryTime: '15 mins',
       restaurant: 'Taco Fiesta',
+      orderType: 'individual',
       items: [
         { name: 'Chicken Tacos (3pc)', price: 15.99, quantity: 1, image: '🌮', category: 'Mexican' },
         { name: 'Beef Burrito', price: 12.99, quantity: 1, image: '🌯', category: 'Mexican' },
         { name: 'Guacamole & Chips', price: 6.99, quantity: 1, image: '🥑', category: 'Appetizers' }
       ]
     },
+
+    // Group Order
     {
       id: 'FD-2024-001098',
       date: '2024-07-12',
       status: 'Preparing',
       paymentMode: 'UPI',
-      total: 52.80,
+      total: 120.45,
       deliveryTime: '40 mins',
       restaurant: 'Sushi Zen',
-      items: [
-        { name: 'California Roll (8pc)', price: 18.99, quantity: 1, image: '🍣', category: 'Sushi' },
-        { name: 'Chicken Teriyaki Bowl', price: 16.99, quantity: 1, image: '🍜', category: 'Bowls' },
-        { name: 'Miso Soup', price: 4.99, quantity: 1, image: '🍲', category: 'Soup' },
-        { name: 'Green Tea', price: 2.99, quantity: 1, image: '🍵', category: 'Beverages' },
-        { name: 'Edamame', price: 5.99, quantity: 1, image: '🫘', category: 'Appetizers' }
+      orderType: 'group',
+      items: [],
+      groupInfo: {
+        totalUsers: 3,
+        organizer: 'David Kim',
+        splitType: 'equal'
+      },
+      userOrders: [
+        {
+          userId: 'user5',
+          userName: 'David Kim',
+          userAvatar: '👨‍🍳',
+          subtotal: 42.95,
+          items: [
+            { name: 'Dragon Roll (8pc)', price: 22.99, quantity: 1, image: '🍣', category: 'Sushi' },
+            { name: 'Chicken Teriyaki Bowl', price: 16.99, quantity: 1, image: '🍜', category: 'Bowls' },
+            { name: 'Miso Soup', price: 2.99, quantity: 1, image: '🍲', category: 'Soup' }
+          ]
+        },
+        {
+          userId: 'user6',
+          userName: 'Lisa Park',
+          userAvatar: '👩‍🎤',
+          subtotal: 38.96,
+          items: [
+            { name: 'California Roll (8pc)', price: 18.99, quantity: 1, image: '🍣', category: 'Sushi' },
+            { name: 'Salmon Sashimi (6pc)', price: 16.99, quantity: 1, image: '🍣', category: 'Sashimi' },
+            { name: 'Green Tea', price: 2.99, quantity: 1, image: '🍵', category: 'Beverages' }
+          ]
+        },
+        {
+          userId: 'user7',
+          userName: 'Tom Rodriguez',
+          userAvatar: '👨‍🎸',
+          subtotal: 34.55,
+          items: [
+            { name: 'Spicy Tuna Roll (8pc)', price: 19.99, quantity: 1, image: '🍣', category: 'Sushi' },
+            { name: 'Edamame', price: 5.99, quantity: 1, image: '🫘', category: 'Appetizers' },
+            { name: 'Sake (Hot)', price: 8.99, quantity: 1, image: '🍶', category: 'Beverages' }
+          ]
+        }
       ]
     },
+
+    // Individual Order
     {
       id: 'FD-2024-001045',
       date: '2024-07-08',
@@ -101,6 +207,7 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
       total: 24.75,
       deliveryTime: '20 mins',
       restaurant: 'Dessert Heaven',
+      orderType: 'individual',
       items: [
         { name: 'Chocolate Cake Slice', price: 8.99, quantity: 1, image: '🍰', category: 'Desserts' },
         { name: 'Vanilla Ice Cream', price: 4.99, quantity: 2, image: '🍨', category: 'Desserts' },
@@ -112,11 +219,10 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
   private animationTimeouts: any[] = [];
 
   ngOnInit() {
-    // Animate orders on mount with staggered effect
     this.orders.forEach((_, index) => {
       const timeout = setTimeout(() => {
         this.animatedOrders.add(index);
-      }, index * 200); // Slightly slower for food theme
+      }, index * 200);
       this.animationTimeouts.push(timeout);
     });
   }
@@ -128,13 +234,36 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
   get filteredOrders(): FoodOrder[] {
     return this.orders.filter(order => {
       const matchesFilter = this.filter === 'all' || order.status.toLowerCase().replace(/\s+/g, '') === this.filter.toLowerCase();
-      const matchesSearch = order.id.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-                           order.restaurant.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-                           order.items.some(item => 
-                             item.name.toLowerCase().includes(this.searchTerm.toLowerCase())
-                           );
+      const matchesSearch = this.matchesSearchTerm(order);
       return matchesFilter && matchesSearch;
     });
+  }
+
+  private matchesSearchTerm(order: FoodOrder): boolean {
+    const searchLower = this.searchTerm.toLowerCase();
+    
+    // Search in order ID and restaurant
+    if (order.id.toLowerCase().includes(searchLower) || 
+        order.restaurant.toLowerCase().includes(searchLower)) {
+      return true;
+    }
+
+    // Search in individual order items
+    if (order.orderType === 'individual') {
+      return order.items.some(item => 
+        item.name.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Search in group order user names and items
+    if (order.orderType === 'group' && order.userOrders) {
+      return order.userOrders.some(userOrder => 
+        userOrder.userName.toLowerCase().includes(searchLower) ||
+        userOrder.items.some(item => item.name.toLowerCase().includes(searchLower))
+      );
+    }
+
+    return false;
   }
 
   getStatusClass(status: string): string {
@@ -165,6 +294,13 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
 
   toggleExpanded(orderId: string) {
     this.expandedOrder = this.expandedOrder === orderId ? null : orderId;
+    if (this.expandedOrder !== orderId) {
+      this.expandedUser = null; // Reset expanded user when collapsing order
+    }
+  }
+
+  toggleUserExpanded(userId: string) {
+    this.expandedUser = this.expandedUser === userId ? null : userId;
   }
 
   formatDate(dateString: string): string {
@@ -188,6 +324,50 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
   }
 
   getTotalItems(order: FoodOrder): number {
-    return order.items.reduce((total, item) => total + item.quantity, 0);
+    if (order.orderType === 'individual') {
+      return order.items.reduce((total, item) => total + item.quantity, 0);
+    } else if (order.orderType === 'group' && order.userOrders) {
+      return order.userOrders.reduce((total, userOrder) => 
+        total + userOrder.items.reduce((userTotal, item) => userTotal + item.quantity, 0), 0
+      );
+    }
+    return 0;
+  }
+
+  getOrderTypeIcon(orderType: string): string {
+    return orderType === 'group' ? '👥' : '👤';
+  }
+
+  getOrderTypeLabel(order: FoodOrder): string {
+    if (order.orderType === 'group' && order.groupInfo) {
+      return `Group Order (${order.groupInfo.totalUsers} people)`;
+    }
+    return 'Individual Order';
+  }
+
+  getAllItemThumbnails(order: FoodOrder): string[] {
+    if (order.orderType === 'individual') {
+      return order.items.slice(0, 4).map(item => item.image);
+    } else if (order.orderType === 'group' && order.userOrders) {
+      const allItems = order.userOrders.flatMap(userOrder => userOrder.items);
+      const uniqueItems = allItems.filter((item, index, arr) => 
+        arr.findIndex(i => i.image === item.image) === index
+      );
+      return uniqueItems.slice(0, 4).map(item => item.image);
+    }
+    return [];
+  }
+
+  getTotalUniqueItems(order: FoodOrder): number {
+    if (order.orderType === 'individual') {
+      return order.items.length;
+    } else if (order.orderType === 'group' && order.userOrders) {
+      const allItems = order.userOrders.flatMap(userOrder => userOrder.items);
+      const uniqueItems = allItems.filter((item, index, arr) => 
+        arr.findIndex(i => i.name === item.name) === index
+      );
+      return uniqueItems.length;
+    }
+    return 0;
   }
 }
