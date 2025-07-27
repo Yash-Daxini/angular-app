@@ -39,7 +39,7 @@
           </svg>
           <input
             type="text"
-            placeholder="Search orders or products..."
+            placeholder="Search orders, products, or users..."
             class="search-input"
             [(ngModel)]="searchTerm"
             />
@@ -53,11 +53,12 @@
         *ngFor="let order of filteredOrders; let i = index"
         class="order-card"
         [class.animated]="isAnimated(i)"
+        [class.group-order]="order.orderType === 'group'"
       >
         <!-- Order Header -->
         <div class="order-header">
           <div class="order-info">
-            <div class="order-icon">
+            <div class="order-icon" [class.group-icon]="order.orderType === 'group'">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                 <circle cx="9" cy="9" r="2"></circle>
@@ -65,7 +66,13 @@
               </svg>
             </div>
             <div class="order-details">
-              <h3 class="order-id">{{ order.id }}</h3>
+              <div class="order-header-row">
+                <h3 class="order-id">{{ order.id }}</h3>
+                <div class="order-type-badge" [class.group-badge]="order.orderType === 'group'">
+                  <span class="order-type-icon">{{ getOrderTypeIcon(order.orderType) }}</span>
+                  <span>{{ getOrderTypeLabel(order) }}</span>
+                </div>
+              </div>
               <div class="order-meta">
                 <div class="meta-item">
                   <svg class="meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -103,6 +110,10 @@
                 </svg>
                 <span>{{ order.paymentMode }}</span>
               </div>
+              <div *ngIf="order.orderType === 'group' && order.groupInfo" class="group-organizer">
+                <span class="organizer-label">👨‍💼 Organizer:</span>
+                <span class="organizer-name">{{ order.groupInfo.organizer }}</span>
+              </div>
             </div>
             
             <div class="action-buttons">
@@ -137,18 +148,45 @@
               <circle cx="9" cy="9" r="2"></circle>
               <path d="m21 15-3.086-3.086a2 2 0 00-1.414-.586H13"></path>
             </svg>
-            <span>{{ order.products.length }} items</span>
+            <span>{{ getTotalItems(order) }} items</span>
+            <span *ngIf="order.orderType === 'group'" class="group-summary">
+              • {{ getTotalUniqueItems(order) }} unique products
+            </span>
           </div>
           <div class="product-thumbnails">
             <div
-              *ngFor="let product of order.products.slice(0, 4); let idx = index"
-              class="product-thumb"
-              [title]="product.name"
+              *ngFor="let thumbnail of getAllItemThumbnails(order); let idx = index"
+              class="product-thumb animate-float"
+              [style.animation-delay]="idx * 0.1 + 's'"
+              [title]="getProductName(order, idx)"
             >
-              {{ product.image }}
+              {{ thumbnail }}
             </div>
-            <div *ngIf="order.products.length > 4" class="product-thumb more-items">
-              +{{ order.products.length - 4 }}
+            <div *ngIf="getTotalUniqueItems(order) > 4" class="product-thumb more-items">
+              +{{ getTotalUniqueItems(order) - 4 }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Group Users Summary (for group orders only) -->
+        <div *ngIf="order.orderType === 'group' && order.userOrders" class="group-users-summary">
+          <div class="group-users-header">
+            <svg class="users-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
+            <span>Group Members ({{ order.userOrders.length }})</span>
+          </div>
+          <div class="users-list">
+            <div *ngFor="let userOrder of order.userOrders; let idx = index" class="user-card animate-slide-in"
+              [style.animation-delay]="idx * 0.1 + 's'">
+              <div class="user-info">
+                <div class="user-avatar">{{ userOrder.userAvatar }}</div>
+                <div class="user-details">
+                  <div class="user-name">{{ userOrder.userName }}</div>
+                  <div class="user-items-count">{{ userOrder.products.length }} items</div>
+                </div>
+              </div>
+              <div class="user-total">${{ userOrder.subtotal.toFixed(2) }}</div>
             </div>
           </div>
         </div>
@@ -156,38 +194,137 @@
         <!-- Expanded Product Details -->
         <div *ngIf="expandedOrder === order.id" class="expanded-details animate-expand">
           <div class="details-content">
-            <h4 class="details-title">
-              <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-              </svg>
-              Order Details
-            </h4>
-            <div class="products-list">
-              <div
-                *ngFor="let product of order.products"
-                class="product-item"
-              >
-                <div class="product-info">
-                  <div class="product-image">
-                    {{ product.image }}
+            <!-- Individual Order Details -->
+            <div *ngIf="order.orderType === 'individual'">
+              <h4 class="details-title">
+                <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                </svg>
+                Order Details
+              </h4>
+              <div class="products-list">
+                <div *ngFor="let product of order.products; let idx = index" class="product-item animate-slide-in"
+                  [style.animation-delay]="idx * 0.1 + 's'">
+                  <div class="product-info">
+                    <div class="product-image">
+                      {{ product.image }}
+                    </div>
+                    <div class="product-details">
+                      <h5 class="product-name">{{ product.name }}</h5>
+                      <p class="product-quantity">Quantity: {{ product.quantity }}</p>
+                    </div>
                   </div>
-                  <div class="product-details">
-                    <h5 class="product-name">{{ product.name }}</h5>
-                    <p class="product-quantity">Quantity: {{ product.quantity }}</p>
+                  <div class="product-pricing">
+                    <div class="product-price">${{ product.price }}</div>
+                    <div *ngIf="product.quantity > 1" class="product-total">
+                      ${{ calculateProductTotal(product).toFixed(2) }} total
+                    </div>
                   </div>
                 </div>
-                <div class="product-pricing">
-                  <div class="product-price">${{ product.price }}</div>
-                  <div *ngIf="product.quantity > 1" class="product-total">
-                    ${{ calculateProductTotal(product).toFixed(2) }} total
+                
+                <!-- Order Summary -->
+                <div class="order-summary">
+                  <div class="grand-total">
+                    <span>Grand Total</span>
+                    <span class="total-price">${{ order.total }}</span>
                   </div>
                 </div>
               </div>
-              
-              <!-- Order Summary -->
-              <div class="order-summary">
-                <div class="grand-total">
-                  <span>Grand Total</span>
+            </div>
+
+            <!-- Group Order Details -->
+            <div *ngIf="order.orderType === 'group' && order.userOrders">
+              <h4 class="details-title">
+                <svg class="users-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                Group Order Details
+              </h4>
+
+              <div class="group-order-info">
+                <div class="group-meta">
+                  <div class="group-meta-item">
+                    <span class="meta-label">👨‍💼 Organizer:</span>
+                    <span class="meta-value">{{ order.groupInfo?.organizer }}</span>
+                  </div>
+                  <div class="group-meta-item">
+                    <span class="meta-label">💰 Split Type:</span>
+                    <span class="meta-value">{{ order.groupInfo?.splitType === 'equal' ? 'Equal Split' : 'Individual Payment' }}</span>
+                  </div>
+                  <div class="group-meta-item">
+                    <span class="meta-label">👥 Total Members:</span>
+                    <span class="meta-value">{{ order.groupInfo?.totalUsers }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="group-users-detailed">
+                <div *ngFor="let userOrder of order.userOrders; let userIdx = index" class="user-order-card animate-slide-in"
+                  [style.animation-delay]="userIdx * 0.15 + 's'">
+                  <div class="user-order-header" (click)="toggleUserExpanded(userOrder.userId)">
+                    <div class="user-info-detailed">
+                      <div class="user-avatar-large">{{ userOrder.userAvatar }}</div>
+                      <div class="user-details-detailed">
+                        <h5 class="user-name-large">{{ userOrder.userName }}</h5>
+                        <p class="user-items-summary">{{ userOrder.products.length }} items • ${{ userOrder.subtotal.toFixed(2) }}</p>
+                      </div>
+                    </div>
+                    <div class="user-expand-btn">
+                      <svg *ngIf="expandedUser !== userOrder.userId" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polyline points="6,9 12,15 18,9"></polyline>
+                      </svg>
+                      <svg *ngIf="expandedUser === userOrder.userId" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polyline points="18,15 12,9 6,15"></polyline>
+                      </svg>
+                    </div>
+                  </div>
+
+                  <!-- User's Items (Expandable) -->
+                  <div *ngIf="expandedUser === userOrder.userId" class="user-items-list animate-expand">
+                    <div *ngFor="let product of userOrder.products; let itemIdx = index" class="product-item user-product-item animate-slide-in"
+                      [style.animation-delay]="itemIdx * 0.1 + 's'">
+                      <div class="product-info">
+                        <div class="product-image">
+                          {{ product.image }}
+                        </div>
+                        <div class="product-details">
+                          <h6 class="product-name">{{ product.name }}</h6>
+                          <p class="product-quantity">Quantity: {{ product.quantity }}</p>
+                        </div>
+                      </div>
+                      <div class="product-pricing">
+                        <div class="product-price">${{ product.price }}</div>
+                        <div *ngIf="product.quantity > 1" class="product-total">
+                          ${{ calculateProductTotal(product).toFixed(2) }} total
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- User Subtotal -->
+                    <div class="user-subtotal">
+                      <span>{{ userOrder.userName }}'s Total</span>
+                      <span class="user-total-amount">${{ userOrder.subtotal.toFixed(2) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Group Order Summary -->
+              <div class="group-order-summary">
+                <div class="group-summary-header">
+                  <svg class="summary-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                  </svg>
+                  <span>Group Order Summary</span>
+                </div>
+                <div class="group-delivery-info">
+                  <div *ngIf="order.groupInfo?.splitType === 'equal'" class="delivery-item">
+                    <span>Per Person ({{ order.groupInfo?.totalUsers }} people)</span>
+                    <span>${{ (order.total / (order.groupInfo ? order.groupInfo.totalUsers : 1)).toFixed(2) }}</span>
+                  </div>
+                </div>
+                <div class="grand-total group-grand-total">
+                  <span>Total Group Order</span>
                   <span class="total-price">${{ order.total }}</span>
                 </div>
               </div>
