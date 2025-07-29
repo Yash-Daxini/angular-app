@@ -8,7 +8,6 @@
 
 .container {
     min-height: 100vh;
-    background: linear-gradient(135deg, #fef3c7 0%, #ffffff 30%, #fce7f3 70%, #fef3c7 100%);
     padding: 24px;
     position: relative;
 }
@@ -406,20 +405,94 @@
     background-clip: text;
 }
 
+/* Enhanced Payment Method Styles */
+.payment-method-container {
+    margin-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: 8px;
+}
+
 .payment-method {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.single-payment {
+    color: #6b7280;
+}
+
+.multiple-payment {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.payment-summary {
     display: flex;
     align-items: center;
     gap: 6px;
     color: #6b7280;
     font-size: 0.95rem;
     font-weight: 500;
-    margin-top: 4px;
+}
+
+.payment-preview {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.payment-chip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid;
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: chip-slide-in 0.4s ease-out forwards;
+}
+
+.payment-chip:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.chip-icon {
+    font-size: 0.9rem;
+}
+
+.chip-amount {
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.more-payments {
+    background: rgba(107, 114, 128, 0.1) !important;
+    border-color: rgba(107, 114, 128, 0.3) !important;
+    color: #6b7280;
+    font-size: 0.7rem;
+    padding: 4px 6px;
+    justify-content: center;
 }
 
 .payment-icon {
     width: 18px;
     height: 18px;
     stroke-width: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
 }
 
 .group-organizer {
@@ -759,6 +832,92 @@
     color: #059669;
     margin-top: 2px;
     font-weight: 600;
+}
+
+/* Payment Breakdown Styles */
+.payment-breakdown {
+    margin-top: 16px;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(255, 255, 255, 0.8) 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.group-payment-breakdown {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(255, 255, 255, 0.8) 100%);
+    border-color: rgba(139, 92, 246, 0.2);
+}
+
+.payment-breakdown-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #3b82f6;
+    margin-bottom: 16px;
+}
+
+.group-payment-breakdown .payment-breakdown-title {
+    color: #8b5cf6;
+}
+
+.payment-breakdown-icon {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
+}
+
+.payment-methods-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.payment-method-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateX(-20px);
+}
+
+.payment-method-item:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.group-payment-item {
+    border-left: 3px solid rgba(139, 92, 246, 0.3);
+}
+
+.payment-method-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.payment-method-icon {
+    font-size: 1.2rem;
+    width: 24px;
+    text-align: center;
+}
+
+.payment-method-name {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 0.95rem;
+}
+
+.payment-method-amount {
+    font-weight: 700;
+    font-size: 1rem;
 }
 
 /* Group Order Detailed View */
@@ -1127,6 +1286,17 @@
     }
 }
 
+@keyframes chip-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
 .animate-fade-in {
     animation: fade-in 0.8s ease-out;
 }
@@ -1145,6 +1315,48 @@
 
 .animate-slide-in {
     animation: slide-in 0.4s ease-out forwards;
+}
+
+/* Animation delays for staggered effects */
+.payment-chip:nth-child(1) { animation-delay: 0.1s; }
+.payment-chip:nth-child(2) { animation-delay: 0.2s; }
+.payment-chip:nth-child(3) { animation-delay: 0.3s; }
+.payment-chip:nth-child(4) { animation-delay: 0.4s; }
+
+/* Hover effects for payment method container */
+.payment-method-container:hover .payment-chip {
+    transform: translateY(-1px);
+}
+
+.payment-method-container:hover .payment-chip:hover {
+    transform: translateY(-3px) scale(1.05);
+}
+
+/* Group order specific payment styling */
+.group-order .payment-method-container {
+    border-top: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.group-order .payment-breakdown {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(255, 255, 255, 0.9) 100%);
+}
+
+/* Success/completion styling for delivered orders */
+.order-card[class*="status-delivered"] .payment-chip {
+    border-color: rgba(34, 197, 94, 0.4);
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05));
+}
+
+/* Loading/preparing styling */
+.order-card[class*="status-preparing"] .payment-chip {
+    border-color: rgba(245, 158, 11, 0.4);
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+}
+
+/* Transit styling for on-the-way orders */
+.order-card[class*="status-ontheway"] .payment-chip {
+    border-color: rgba(59, 130, 246, 0.4);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
 }
 
 /* Responsive Design */
@@ -1203,6 +1415,42 @@
         margin-left: -8px;
     }
 
+    /* Payment Method Responsive */
+    .payment-preview {
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .payment-chip {
+        font-size: 0.75rem;
+        padding: 3px 6px;
+    }
+    
+    .chip-amount {
+        font-size: 0.7rem;
+    }
+    
+    .payment-breakdown {
+        padding: 16px;
+    }
+    
+    .payment-method-item {
+        padding: 10px 12px;
+    }
+    
+    .payment-method-icon {
+        font-size: 1.1rem;
+        width: 20px;
+    }
+    
+    .payment-method-name {
+        font-size: 0.9rem;
+    }
+    
+    .payment-method-amount {
+        font-size: 0.95rem;
+    }
+
     /* Group Order Responsive */
     .order-header-row {
         flex-direction: column;
@@ -1257,6 +1505,31 @@
 
     .total-amount {
         font-size: 1.8rem;
+    }
+
+    /* Payment Method Mobile */
+    .multiple-payment {
+        align-items: center;
+    }
+    
+    .payment-preview {
+        flex-direction: column;
+        gap: 6px;
+        width: 100%;
+    }
+    
+    .payment-chip {
+        width: 100%;
+        justify-content: space-between;
+        padding: 6px 10px;
+    }
+    
+    .payment-methods-list {
+        gap: 8px;
+    }
+    
+    .payment-breakdown-title {
+        font-size: 1rem;
     }
 
     /* Group Order Mobile */

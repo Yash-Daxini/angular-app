@@ -10,6 +10,13 @@ interface FoodItem {
   category: string;
 }
 
+interface PaymentTransaction {
+  method: string;
+  amount: number;
+  icon: string;
+  color: string;
+}
+
 interface UserOrder {
   userId: string;
   userName: string;
@@ -22,7 +29,8 @@ interface FoodOrder {
   id: string;
   date: string;
   status: string;
-  paymentMode: string;
+  paymentMode: string; // Keep for backward compatibility
+  paymentTransactions?: PaymentTransaction[]; // New field for multiple payments
   total: number;
   deliveryTime: string;
   restaurant: string;
@@ -50,12 +58,17 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
   searchTerm = '';
 
   orders: FoodOrder[] = [
-    // Individual Order
+    // Individual Order with multiple payment methods
     {
       id: 'FD-2024-001234',
       date: '2024-07-20',
       status: 'Delivered',
-      paymentMode: 'Credit Card',
+      paymentMode: 'Multiple Methods', // Updated for display
+      paymentTransactions: [
+        { method: 'Credit Card', amount: 25.00, icon: '💳', color: '#3b82f6' },
+        { method: 'Gift Card', amount: 10.00, icon: '🎁', color: '#10b981' },
+        { method: 'Cash', amount: 7.95, icon: '💵', color: '#059669' }
+      ],
       total: 42.95,
       deliveryTime: '25 mins',
       restaurant: 'Burger Palace',
@@ -68,17 +81,20 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
       ]
     },
 
-    // Group Order
+    // Group Order with single payment method
     {
       id: 'FD-2024-001189',
       date: '2024-07-18',
       status: 'Delivered',
       paymentMode: 'Digital Wallet',
+      paymentTransactions: [
+        { method: 'Digital Wallet', amount: 85.50, icon: '📱', color: '#8b5cf6' }
+      ],
       total: 85.50,
       deliveryTime: '35 mins',
       restaurant: 'Pizza Corner',
       orderType: 'group',
-      items: [], // Empty for group orders
+      items: [],
       groupInfo: {
         totalUsers: 4,
         organizer: 'Alex Johnson',
@@ -128,12 +144,16 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
       ]
     },
 
-    // Individual Order
+    // Individual Order with mixed payment methods
     {
       id: 'FD-2024-001156',
       date: '2024-07-15',
       status: 'On the Way',
-      paymentMode: 'Cash on Delivery',
+      paymentMode: 'Mixed Payment',
+      paymentTransactions: [
+        { method: 'UPI', amount: 20.00, icon: '📲', color: '#f59e0b' },
+        { method: 'Cash on Delivery', amount: 15.75, icon: '💵', color: '#059669' }
+      ],
       total: 35.75,
       deliveryTime: '15 mins',
       restaurant: 'Taco Fiesta',
@@ -145,12 +165,18 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
       ]
     },
 
-    // Group Order
+    // Group Order with complex payment split
     {
       id: 'FD-2024-001098',
       date: '2024-07-12',
       status: 'Preparing',
-      paymentMode: 'UPI',
+      paymentMode: 'Split Payment',
+      paymentTransactions: [
+        { method: 'Credit Card', amount: 50.00, icon: '💳', color: '#3b82f6' },
+        { method: 'PayPal', amount: 35.45, icon: '🏦', color: '#0070ba' },
+        { method: 'Gift Card', amount: 25.00, icon: '🎁', color: '#10b981' },
+        { method: 'Cash', amount: 10.00, icon: '💵', color: '#059669' }
+      ],
       total: 120.45,
       deliveryTime: '40 mins',
       restaurant: 'Sushi Zen',
@@ -198,7 +224,7 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
       ]
     },
 
-    // Individual Order
+    // Individual Order with single payment method (backward compatibility)
     {
       id: 'FD-2024-001045',
       date: '2024-07-08',
@@ -241,29 +267,71 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
 
   private matchesSearchTerm(order: FoodOrder): boolean {
     const searchLower = this.searchTerm.toLowerCase();
-    
+
     // Search in order ID and restaurant
-    if (order.id.toLowerCase().includes(searchLower) || 
-        order.restaurant.toLowerCase().includes(searchLower)) {
+    if (order.id.toLowerCase().includes(searchLower) ||
+      order.restaurant.toLowerCase().includes(searchLower)) {
       return true;
     }
 
     // Search in individual order items
     if (order.orderType === 'individual') {
-      return order.items.some(item => 
+      return order.items.some(item =>
         item.name.toLowerCase().includes(searchLower)
       );
     }
 
     // Search in group order user names and items
     if (order.orderType === 'group' && order.userOrders) {
-      return order.userOrders.some(userOrder => 
+      return order.userOrders.some(userOrder =>
         userOrder.userName.toLowerCase().includes(searchLower) ||
         userOrder.items.some(item => item.name.toLowerCase().includes(searchLower))
       );
     }
 
     return false;
+  }
+
+  // New method to check if order has multiple payment methods
+  hasMultiplePayments(order: FoodOrder): boolean {
+    return !!order.paymentTransactions && order.paymentTransactions.length > 1;
+  }
+
+  // New method to get payment display info
+  getPaymentDisplayInfo(order: FoodOrder): { method: string; icon: string; amount?: number } {
+    if (order.paymentTransactions && order.paymentTransactions.length === 1) {
+      const transaction = order.paymentTransactions[0];
+      return {
+        method: transaction.method,
+        icon: transaction.icon,
+        amount: transaction.amount
+      };
+    } else if (order.paymentTransactions && order.paymentTransactions.length > 1) {
+      return {
+        method: `${order.paymentTransactions.length} Methods`,
+        icon: '💳',
+        amount: order.total
+      };
+    } else {
+      // Fallback for backward compatibility
+      return {
+        method: order.paymentMode,
+        icon: this.getPaymentIcon(order.paymentMode)
+      };
+    }
+  }
+
+  // Helper method to get payment icon for backward compatibility
+  private getPaymentIcon(paymentMode: string): string {
+    const iconMap: { [key: string]: string } = {
+      'Credit Card': '💳',
+      'Digital Wallet': '📱',
+      'Cash on Delivery': '💵',
+      'UPI': '📲',
+      'PayPal': '🏦',
+      'Gift Card': '🎁'
+    };
+    return iconMap[paymentMode] || '💳';
   }
 
   getStatusClass(status: string): string {
@@ -295,7 +363,7 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
   toggleExpanded(orderId: string) {
     this.expandedOrder = this.expandedOrder === orderId ? null : orderId;
     if (this.expandedOrder !== orderId) {
-      this.expandedUser = null; // Reset expanded user when collapsing order
+      this.expandedUser = null;
     }
   }
 
@@ -327,7 +395,7 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
     if (order.orderType === 'individual') {
       return order.items.reduce((total, item) => total + item.quantity, 0);
     } else if (order.orderType === 'group' && order.userOrders) {
-      return order.userOrders.reduce((total, userOrder) => 
+      return order.userOrders.reduce((total, userOrder) =>
         total + userOrder.items.reduce((userTotal, item) => userTotal + item.quantity, 0), 0
       );
     }
@@ -350,7 +418,7 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
       return order.items.slice(0, 4).map(item => item.image);
     } else if (order.orderType === 'group' && order.userOrders) {
       const allItems = order.userOrders.flatMap(userOrder => userOrder.items);
-      const uniqueItems = allItems.filter((item, index, arr) => 
+      const uniqueItems = allItems.filter((item, index, arr) =>
         arr.findIndex(i => i.image === item.image) === index
       );
       return uniqueItems.slice(0, 4).map(item => item.image);
@@ -363,7 +431,7 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
       return order.items.length;
     } else if (order.orderType === 'group' && order.userOrders) {
       const allItems = order.userOrders.flatMap(userOrder => userOrder.items);
-      const uniqueItems = allItems.filter((item, index, arr) => 
+      const uniqueItems = allItems.filter((item, index, arr) =>
         arr.findIndex(i => i.name === item.name) === index
       );
       return uniqueItems.length;
