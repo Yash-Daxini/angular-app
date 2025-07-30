@@ -25,6 +25,8 @@ interface UserOrder {
   subtotal: number;
 }
 
+type OrderType = 'group' | 'individual' ;
+
 interface FoodOrder {
   id: string;
   date: string;
@@ -34,7 +36,7 @@ interface FoodOrder {
   total: number;
   deliveryTime: string;
   restaurant: string;
-  orderType: 'individual' | 'group';
+  orderType: OrderType;
   items: FoodItem[]; // For individual orders
   userOrders?: UserOrder[]; // For group orders
   groupInfo?: {

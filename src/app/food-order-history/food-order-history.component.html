@@ -176,18 +176,43 @@
           <div class="order-actions">
             <div class="order-total">
               <div class="total-amount">${{ order.total }}</div>
-              <div class="payment-method">
-                <svg
-                  class="payment-icon"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                >
-                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                  <line x1="1" y1="10" x2="23" y2="10"></line>
-                </svg>
-                <span>{{ order.paymentMode }}</span>
+              
+              <!-- Enhanced Payment Method Display -->
+              <div class="payment-method-container">
+                <!-- Single Payment Method -->
+                <div *ngIf="!hasMultiplePayments(order)" class="payment-method single-payment">
+                  <span class="payment-icon">{{ getPaymentDisplayInfo(order).icon }}</span>
+                  <span>{{ getPaymentDisplayInfo(order).method }}</span>
+                </div>
+              
+                <!-- Multiple Payment Methods -->
+                <div *ngIf="hasMultiplePayments(order)" class="payment-method multiple-payment">
+                  <div class="payment-summary">
+                    <span class="payment-icon">💳</span>
+                    <span>{{ order.paymentTransactions!.length }} Payment Methods</span>
+                  </div>
+                  <div class="payment-preview">
+                    <div 
+                      *ngFor="let transaction of order.paymentTransactions; let idx = index" 
+                      class="payment-chip"
+                      [style.border-color]="transaction.color + '40'"
+                      [style.background]="'linear-gradient(135deg, ' + transaction.color + '15, ' + transaction.color + '05)'"
+                      [style.color]="transaction.color"
+                      [style.animation-delay]="(idx * 0.1) + 's'"
+                    >
+                      <span class="chip-icon">{{ transaction.icon }}</span>
+                      <span class="chip-amount">${{ transaction.amount.toFixed(2) }}</span>
+                    </div>
+                    <div 
+                      *ngIf="order.paymentTransactions && order.paymentTransactions.length > 3" 
+                      class="payment-chip more-payments"
+                    >
+                      +{{ order.paymentTransactions.length - 3 }}
+                    </div>
+                  </div>
+                </div>
               </div>
+
               <div
                 *ngIf="order.orderType === 'group' && order.groupInfo"
                 class="group-organizer"
@@ -379,6 +404,39 @@
                   </div>
                 </div>
 
+                <!-- Payment Breakdown for Individual Orders -->
+                <div 
+                  *ngIf="hasMultiplePayments(order)" 
+                  class="payment-breakdown"
+                  [class.group-payment-breakdown]="order.orderType !== 'individual'"
+                >
+                  <div class="payment-breakdown-title">
+                    <svg class="payment-breakdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                      <line x1="1" y1="10" x2="23" y2="10"></line>
+                    </svg>
+                    <span>Payment Breakdown</span>
+                  </div>
+                  <div class="payment-methods-list">
+                    <div 
+                      *ngFor="let transaction of order.paymentTransactions; let idx = index" 
+                      class="payment-method-item"
+                      [style.animation-delay]="(idx * 0.1) + 's'"
+                    >
+                      <div class="payment-method-info">
+                        <span class="payment-method-icon">{{ transaction.icon }}</span>
+                        <span class="payment-method-name">{{ transaction.method }}</span>
+                      </div>
+                      <div 
+                        class="payment-method-amount"
+                        [style.color]="transaction.color"
+                      >
+                        ${{ transaction.amount.toFixed(2) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- Order Summary -->
                 <div class="order-summary">
                   <div class="delivery-info">
@@ -527,6 +585,38 @@
                       <span class="user-total-amount"
                         >${{ userOrder.subtotal.toFixed(2) }}</span
                       >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Payment Breakdown for Group Orders -->
+              <div 
+                *ngIf="hasMultiplePayments(order)" 
+                class="payment-breakdown group-payment-breakdown"
+              >
+                <div class="payment-breakdown-title">
+                  <svg class="payment-breakdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                  </svg>
+                  <span>Group Payment Breakdown</span>
+                </div>
+                <div class="payment-methods-list">
+                  <div 
+                    *ngFor="let transaction of order.paymentTransactions; let idx = index" 
+                    class="payment-method-item group-payment-item"
+                    [style.animation-delay]="(idx * 0.1) + 's'"
+                  >
+                    <div class="payment-method-info">
+                      <span class="payment-method-icon">{{ transaction.icon }}</span>
+                      <span class="payment-method-name">{{ transaction.method }}</span>
+                    </div>
+                    <div 
+                      class="payment-method-amount"
+                      [style.color]="transaction.color"
+                    >
+                      ${{ transaction.amount.toFixed(2) }}
                     </div>
                   </div>
                 </div>
