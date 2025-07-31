@@ -25,8 +25,6 @@ interface UserOrder {
   subtotal: number;
 }
 
-type OrderType = 'group' | 'individual' ;
-
 interface FoodOrder {
   id: string;
   date: string;
@@ -36,7 +34,7 @@ interface FoodOrder {
   total: number;
   deliveryTime: string;
   restaurant: string;
-  orderType: OrderType;
+  orderType: 'individual' | 'group';
   items: FoodItem[]; // For individual orders
   userOrders?: UserOrder[]; // For group orders
   groupInfo?: {
@@ -241,6 +239,32 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
         { name: 'Vanilla Ice Cream', price: 4.99, quantity: 2, image: '🍨', category: 'Desserts' },
         { name: 'Fresh Juice', price: 5.99, quantity: 1, image: '🧃', category: 'Beverages' }
       ]
+    },
+
+    // Additional Individual Order with multiple payment methods (more complex example)
+    {
+      id: 'FD-2024-001067',
+      date: '2024-07-10',
+      status: 'Delivered',
+      paymentMode: 'Complex Split',
+      paymentTransactions: [
+        { method: 'Credit Card', amount: 45.50, icon: '💳', color: '#3b82f6' },
+        { method: 'PayPal', amount: 25.00, icon: '🏦', color: '#0070ba' },
+        { method: 'Apple Pay', amount: 15.25, icon: '📱', color: '#000000' },
+        { method: 'Gift Card', amount: 20.00, icon: '🎁', color: '#10b981' },
+        { method: 'Loyalty Points', amount: 8.75, icon: '⭐', color: '#f59e0b' }
+      ],
+      total: 114.50,
+      deliveryTime: '30 mins',
+      restaurant: 'Gourmet Bistro',
+      orderType: 'individual',
+      items: [
+        { name: 'Grilled Salmon', price: 28.99, quantity: 1, image: '🐟', category: 'Seafood' },
+        { name: 'Truffle Pasta', price: 24.99, quantity: 1, image: '🍝', category: 'Pasta' },
+        { name: 'Caesar Salad', price: 12.99, quantity: 1, image: '🥗', category: 'Salads' },
+        { name: 'Tiramisu', price: 8.99, quantity: 2, image: '🍰', category: 'Desserts' },
+        { name: 'Wine (Glass)', price: 12.99, quantity: 2, image: '🍷', category: 'Beverages' }
+      ]
     }
   ];
 
@@ -323,6 +347,14 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
     }
   }
 
+  // New method to get payment preview (first 3 transactions for display)
+  getPaymentPreview(order: FoodOrder): PaymentTransaction[] {
+    if (order.paymentTransactions && order.paymentTransactions.length > 1) {
+      return order.paymentTransactions.slice(0, 3);
+    }
+    return [];
+  }
+
   // Helper method to get payment icon for backward compatibility
   private getPaymentIcon(paymentMode: string): string {
     const iconMap: { [key: string]: string } = {
@@ -331,7 +363,12 @@ export class FoodOrderHistoryComponent implements OnInit, OnDestroy {
       'Cash on Delivery': '💵',
       'UPI': '📲',
       'PayPal': '🏦',
-      'Gift Card': '🎁'
+      'Gift Card': '🎁',
+      'Apple Pay': '📱',
+      'Google Pay': '📱',
+      'Loyalty Points': '⭐',
+      'Bank Transfer': '🏦',
+      'Cash': '💵'
     };
     return iconMap[paymentMode] || '💳';
   }

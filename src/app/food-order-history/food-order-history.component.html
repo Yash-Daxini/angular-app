@@ -184,7 +184,7 @@
                   <span class="payment-icon">{{ getPaymentDisplayInfo(order).icon }}</span>
                   <span>{{ getPaymentDisplayInfo(order).method }}</span>
                 </div>
-              
+
                 <!-- Multiple Payment Methods -->
                 <div *ngIf="hasMultiplePayments(order)" class="payment-method multiple-payment">
                   <div class="payment-summary">
@@ -193,7 +193,7 @@
                   </div>
                   <div class="payment-preview">
                     <div 
-                      *ngFor="let transaction of order.paymentTransactions; let idx = index" 
+                      *ngFor="let transaction of getPaymentPreview(order); let idx = index" 
                       class="payment-chip"
                       [style.border-color]="transaction.color + '40'"
                       [style.background]="'linear-gradient(135deg, ' + transaction.color + '15, ' + transaction.color + '05)'"
