@@ -300,20 +300,6 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
     this.expandedUser = this.expandedUser === userId ? null : userId;
   }
 
-  reorderItems() {
-    if (this.order) {
-      console.log('Reordering items from order:', this.order.id);
-      // Implement reorder logic
-    }
-  }
-
-  trackOrder() {
-    if (this.order) {
-      console.log('Tracking order:', this.order.id);
-      // Implement order tracking logic
-    }
-  }
-
   contactRestaurant() {
     if (this.order?.restaurantPhone) {
       window.open(`tel:${this.order.restaurantPhone}`);
@@ -324,13 +310,6 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
     if (this.order) {
       console.log('Downloading receipt for order:', this.order.id);
       // Implement receipt download logic
-    }
-  }
-
-  reportIssue() {
-    if (this.order) {
-      console.log('Reporting issue for order:', this.order.id);
-      // Implement issue reporting logic
     }
   }
 

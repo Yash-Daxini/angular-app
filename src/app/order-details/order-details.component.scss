@@ -8,8 +8,8 @@
 
 .order-details-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   padding: 20px;
+  width: 70vw;
 }
 
 /* Loading State */
@@ -278,30 +278,6 @@
   text-decoration: none;
 }
 
-.primary-btn {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
-  color: white;
-  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
-}
-
-.primary-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
-}
-
-.secondary-btn {
-  background: rgba(255, 255, 255, 0.8);
-  color: #374151;
-  border: 2px solid rgba(107, 114, 128, 0.2);
-  backdrop-filter: blur(10px);
-}
-
-.secondary-btn:hover {
-  background: rgba(255, 255, 255, 0.95);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-}
-
 .action-btn svg {
   width: 18px;
   height: 18px;
@@ -311,7 +287,7 @@
 /* Main Content Grid */
 .main-content {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
+  grid-template-columns: 1.3fr 1fr;
   gap: 24px;
 }
 
@@ -346,11 +322,6 @@
   font-weight: 700;
   color: #1f2937;
   margin: 0;
-}
-
-/* Restaurant Card */
-.restaurant-details {
-  padding: 20px 24px;
 }
 
 .detail-item {
@@ -388,65 +359,6 @@
   transform: translateY(-1px);
 }
 
-/* Delivery Card */
-.delivery-details {
-  padding: 20px 24px;
-}
-
-.address-section, .notes-section, .timing-section {
-  margin-bottom: 20px;
-}
-
-.address-section:last-child,
-.notes-section:last-child,
-.timing-section:last-child {
-  margin-bottom: 0;
-}
-
-.address-section h4, .notes-section h4, .timing-section h4 {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.address-section p, .notes-section p, .timing-section p {
-  color: #6b7280;
-  line-height: 1.5;
-}
-
-/* Group Info Card */
-.group-info-card {
-  border-left: 4px solid #8b5cf6;
-}
-
-.group-meta {
-  padding: 20px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.group-meta-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.meta-label {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: #374151;
-}
-
-.meta-value {
-  color: #8b5cf6;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
 /* Items Card */
 .items-list, .group-items-list {
   padding: 20px 24px;
@@ -461,7 +373,6 @@
   border-radius: 12px;
   margin-bottom: 12px;
   transition: all 0.3s ease;
-  opacity: 0;
   transform: translateX(-20px);
 }
 
@@ -762,11 +673,6 @@
     align-items: flex-start;
     gap: 20px;
   }
-  
-  .header-actions {
-    width: 100%;
-    justify-content: flex-start;
-  }
 }
 
 @media (max-width: 768px) {
@@ -794,11 +700,6 @@
     gap: 8px;
   }
   
-  .header-actions {
-    flex-direction: column;
-    width: 100%;
-  }
-  
   .action-btn {
     width: 100%;
     justify-content: center;
@@ -808,8 +709,6 @@
     padding: 20px 20px 12px;
   }
   
-  .restaurant-details,
-  .delivery-details,
   .group-meta,
   .items-list,
   .group-items-list,
