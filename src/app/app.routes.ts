@@ -5,6 +5,7 @@ import { OrderHistoryComponent } from './order-history/order-history.component';
 import { FoodOrderHistoryComponent } from './food-order-history/food-order-history.component';
 import { NewOrderHistoryComponent } from './new-order-history/new-order-history.component';
 import { OrderDetailsComponent } from './order-details/order-details.component';
+import { OrderedProductsComponent } from './ordered-products/ordered-products.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -12,5 +13,6 @@ export const routes: Routes = [
     { path: 'order-history', component: OrderHistoryComponent },
     { path: 'food-order-history', component: FoodOrderHistoryComponent },
     { path: 'new-order-history', component: NewOrderHistoryComponent },
-    { path: 'order-details/:id', component: OrderDetailsComponent }
+    { path: 'order-details/:id', component: OrderDetailsComponent },
+    { path: 'ordered-products', component: OrderedProductsComponent }
 ];
